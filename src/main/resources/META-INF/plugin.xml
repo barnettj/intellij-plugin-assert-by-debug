@@ -1,0 +1,64 @@
+<idea-plugin>
+    <id>dev.fervento.assert-by-debug</id>
+    <name>Assert By Debug</name>
+    <vendor email="support@fervento.dev" url="http://fervento.dev">Fervento</vendor>
+
+    <description><![CDATA[
+    <p><b>Create assertions while debugging.</b></p>
+    <p>A convenient context menu for your debugger to copy the state of your POJOs instances as JUnit Assertions, JSON or JSOG.</p>
+
+    <h3>Features</h3>
+    <ul>
+        <li>Useful to quick write test cases from live code inspections during debugging.</li>
+        <li>Copy as JSON/JSOG to serialize the instance state of your objects.</li>
+    </ul>
+
+    <h3>Supported Types</h3>
+    <ul>
+        <li>Primitive Types (including arrays and enum types)</li>
+        <li>Java Collections (map/list/set)</li>
+        <li>Any POJOs</li>
+        <li>java.util.UUID</li>
+    </ul>
+    <p>The list will be extended in future release.</p>
+
+    <h3>Contribute</h3>
+    <p>Please, contribute to the open source project or report any issues at the <a href="http://github.com/fervento/intellij-plugin-assert-by-debug">link</a>.</p>
+    <br>
+    <p><b>Fervento<sub>&copy;</sub></b> | <a href="http://fervento.engineering">Website</a> | <a href="https://twitter.com/ferventosystems">Twitter</a> | <a href="http://github.com/fervento">GitHub</a> | <a href="https://www.linkedin.com/company/fervento-systems">LinkedIn</a></p>
+    <br>
+    ]]></description>
+
+    <change-notes><![CDATA[
+        Version 1.0
+        <ul>
+            <li>First release for IntelliJ 2019.1</li>
+        </ul>
+    ]]></change-notes>
+
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
+         on how to target different products -->
+    <!-- uncomment to enable plugin in all products
+    <depends>com.intellij.modules.lang</depends>
+    -->
+
+    <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.xdebugger</depends>
+    <depends>com.intellij.modules.java</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <!-- Add your extensions here -->
+    </extensions>
+
+    <actions>
+        <group id="CustomDefaultActionGroup"
+               text="Copy selected objects as" description="Assert By Debug Plugin Copy Actions" popup="true">
+            <add-to-group group-id="XDebugger.ValueGroup" anchor="first"/>
+            <action id="AssertByDebugCopyAsJUnitAssertion" class="CopyAsJUnitAssertionsAction" text="Copy selected objects as JUnit assertions" />
+            <action id="AssertByDebugCopyAsJSON" class="CopyAsJSONAction" text="Copy selected objects as JSON" />
+            <action id="AssertByDebugCopyAsJSOG" class="CopyAsJSOGAction" text="Copy selected objects as JSOG" />
+        </group>
+
+    </actions>
+</idea-plugin>
