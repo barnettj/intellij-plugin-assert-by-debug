@@ -8,9 +8,9 @@ import com.sun.jdi.StringReference;
 import dev.fervento.assertbydebug.BeanParser;
 import dev.fervento.assertbydebug.ParserUtils;
 import dev.fervento.assertbydebug.TypeParser;
-import dev.fervento.assertbydebug.serializer.JUnitSerializer;
 import dev.fervento.assertbydebug.entity.FieldNode;
 import dev.fervento.assertbydebug.entity.ReferencedNode;
+import dev.fervento.assertbydebug.serializer.JUnitSerializer;
 import dev.fervento.assertbydebug.serializer.JsonSerializer;
 
 import java.util.Collections;
@@ -78,7 +78,7 @@ public class EnumTypeParser implements TypeParser {
 
         @Override
         public ReferenceType getReferenceType() {
-            return value.referenceType();
+            return enumRef.referenceType();
         }
     }
 
