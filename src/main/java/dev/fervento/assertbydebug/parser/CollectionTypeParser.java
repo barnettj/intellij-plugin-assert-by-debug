@@ -5,12 +5,12 @@ import com.sun.jdi.*;
 import dev.fervento.assertbydebug.BeanParser;
 import dev.fervento.assertbydebug.ParserUtils;
 import dev.fervento.assertbydebug.TypeParser;
-import dev.fervento.assertbydebug.serializer.CodeGenerationContext;
-import dev.fervento.assertbydebug.serializer.CodeScope;
-import dev.fervento.assertbydebug.serializer.JUnitSerializer;
 import dev.fervento.assertbydebug.entity.ArrayFieldNode;
 import dev.fervento.assertbydebug.entity.FieldNode;
 import dev.fervento.assertbydebug.entity.ReferencedNode;
+import dev.fervento.assertbydebug.serializer.CodeGenerationContext;
+import dev.fervento.assertbydebug.serializer.CodeScope;
+import dev.fervento.assertbydebug.serializer.JUnitSerializer;
 import dev.fervento.assertbydebug.serializer.JsonSerializer;
 
 import java.util.Collections;
@@ -134,24 +134,29 @@ public class CollectionTypeParser implements TypeParser {
             CodeScope currentScope = codeGenerationContext.getCurrentScope();
 
             String originalVarName = currentScope.resolveVarName(this);
-            String arrayVarName = currentScope.getOrCreateVarName(this, NAME_COLLECTION);
+            CodeScope.VariableCreation arrayVarNameCreation = currentScope.getOrCreateVarName(this, NAME_COLLECTION);
+            String arrayVarName = arrayVarNameCreation.getVarName();
 
             currentScope.writeLine();
-            currentScope.writeLine(ParserUtils.format("Object[] %s = %s;", arrayVarName, originalVarName));
+            if (arrayVarNameCreation.isNewVariable()) {
+                currentScope.writeLine(ParserUtils.format("Object[] %s = %s;", arrayVarName, originalVarName));
+            }
 
             this.getLength().getFieldNode().toJUnit(jUnitSerializer);
             for (Relation child : getChildren()) {
                 FieldNode fieldNode = child.getFieldNode();
                 if (fieldNode instanceof ReferencedNode) {
                     String originalItemVarName = currentScope.resolveVarName(fieldNode);
-                    String itemName = currentScope.getOrCreateVarName((ReferencedNode) fieldNode, NAME_ITEM);
+                    CodeScope.VariableCreation itemNameCreation = currentScope.getOrCreateVarName((ReferencedNode) fieldNode, NAME_ITEM);
                     String typeName = ParserUtils.JNITypeResolver.toJavaName(((ReferencedNode) fieldNode).getReferenceType().name());
-                    currentScope.writeLine(ParserUtils.format(
-                            "%s %s = %s;",
-                            typeName, itemName,
-                            //typeName,
-                            originalItemVarName));
 
+                    if (itemNameCreation.isNewVariable()) {
+                        currentScope.writeLine(ParserUtils.format(
+                                "%s %s = %s;",
+                                typeName, itemNameCreation.getVarName(),
+                                //typeName,
+                                originalItemVarName));
+                    }
                 }
                 fieldNode.toJUnit(jUnitSerializer);
             }

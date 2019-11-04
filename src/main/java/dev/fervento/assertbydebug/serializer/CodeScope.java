@@ -64,12 +64,30 @@ public class CodeScope implements CodeBlock {
         }
     }
 
-    public String getOrCreateVarName(ReferencedNode referencedNode, String varname) {
+    public VariableCreation getOrCreateVarName(ReferencedNode referencedNode, String varname) {
         Set<String> varNameSet = getVarName(referencedNode);
         if (varNameSet.isEmpty()) {
-            return newVarName(referencedNode, varname);
+            return new VariableCreation(true, newVarName(referencedNode, varname));
         }
-        return varNameSet.iterator().next();
+        return new VariableCreation(false, varNameSet.iterator().next());
+    }
+
+    public static class VariableCreation {
+        private final boolean newVariable;
+        private final String varName;
+
+        public VariableCreation(boolean newVariable, String varName) {
+            this.newVariable = newVariable;
+            this.varName = varName;
+        }
+
+        public boolean isNewVariable() {
+            return newVariable;
+        }
+
+        public String getVarName() {
+            return varName;
+        }
     }
 
     public String newVarName(ReferencedNode referencedNode, String varname) {
