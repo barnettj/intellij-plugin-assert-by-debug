@@ -8,23 +8,24 @@ import com.intellij.debugger.engine.managerThread.DebuggerCommand;
 import com.intellij.debugger.engine.managerThread.DebuggerManagerThread;
 import com.intellij.notification.Notification;
 import com.intellij.notification.NotificationType;
+import com.intellij.openapi.diagnostic.Logger;
 import com.intellij.openapi.ide.CopyPasteManager;
 import com.intellij.openapi.project.Project;
 import com.sun.jdi.*;
 import dev.fervento.assertbydebug.entity.ArrayFieldNode;
+import dev.fervento.assertbydebug.entity.FieldNode;
 import dev.fervento.assertbydebug.entity.NullFieldNode;
 import dev.fervento.assertbydebug.entity.PrimitiveFieldNode;
 import dev.fervento.assertbydebug.parser.*;
+import dev.fervento.assertbydebug.serializer.CodeGenerationContext;
 import dev.fervento.assertbydebug.serializer.impl.JUnitFlatSerializer;
 import dev.fervento.assertbydebug.serializer.impl.JacksonJsonSerializer;
-import dev.fervento.assertbydebug.entity.FieldNode;
 
 import java.awt.datatransfer.StringSelection;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.temporal.Temporal;
 import java.util.*;
-import com.intellij.openapi.diagnostic.Logger;
 
 public class BeanParser implements DebuggerCommand {
 
@@ -125,6 +126,8 @@ public class BeanParser implements DebuggerCommand {
                 notify(false, "Your objects are now in the clipboard");
             }
 
+        } catch (CodeGenerationContext.UnsupportedLoopException e) {
+            notify(true, "Cannot export in this format: a loop has been detected for the field \"" + e.getMessage() + "\"");
         } catch (Exception e) {
             notify(true, "Sorry, something wrong happened: are you exporting supporting types?\n"
                                         + "Check the logs and contribute to the project submitting an issue on <a href=\"https://github.com/fervento/intellij-plugin-assert-by-debug\">https://github.com/fervento/intellij-plugin-assert-by-debug</a>");

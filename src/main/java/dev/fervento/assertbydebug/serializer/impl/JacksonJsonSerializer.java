@@ -11,6 +11,7 @@ import dev.fervento.assertbydebug.entity.FieldNode;
 import dev.fervento.assertbydebug.entity.ReferencedNode;
 import dev.fervento.assertbydebug.entity.SameInstanceFieldNode;
 import dev.fervento.assertbydebug.parser.CollectionTypeParser;
+import dev.fervento.assertbydebug.parser.StringTypeParser;
 import dev.fervento.assertbydebug.serializer.CodeGenerationContext;
 import dev.fervento.assertbydebug.serializer.JsonSerializer;
 
@@ -189,6 +190,11 @@ public class JacksonJsonSerializer implements JsonSerializer {
         //boolean isPojo = isWithFieldName(sameInstanceFieldNode);
         ObjectNode objNode = null;
 
+        if (sameInstanceFieldNode.getOther() instanceof StringTypeParser.StringFieldNode) {
+            sameInstanceFieldNode.getOther().toJson(this);
+            return;
+        }
+
         if (isJsogType(sameInstanceFieldNode.getOther()) && isJsog()) {
             // Deve aggiungere REF
             if (isTopArrayNode()) {
@@ -207,6 +213,9 @@ public class JacksonJsonSerializer implements JsonSerializer {
                 throw new RuntimeException("Expected values already in the map!");
             }
 
+            if (stack.contains(previousValue)) {
+                throw new CodeGenerationContext.UnsupportedLoopException(sameInstanceFieldNode.getFieldName());
+            }
             if (isTopArrayNode()) {
                 getTopAsArrayNode().add(previousValue);
             } else if (isTopObjectNode()) {

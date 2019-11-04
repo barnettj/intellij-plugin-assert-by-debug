@@ -55,4 +55,13 @@ public class CodeGenerationContext {
         codeGenerationCallbacks.addLast(node);
     }
 
+    public static class UnsupportedLoopException extends RuntimeException {
+        public UnsupportedLoopException() {
+        }
+
+        public UnsupportedLoopException(String message) {
+            super(message);
+        }
+    }
+
 }
