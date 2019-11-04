@@ -228,4 +228,24 @@ public class FieldNode {
         }
     }
 
+    public static class CompoundRelation extends Relation {
+        private Relation[] relations;
+
+        public CompoundRelation(Relation... relations) {
+            this.relations = relations;
+        }
+
+        @Override
+        public void appendToPath(StringBuilder stringBuilder) {
+            for (Relation relation : relations) {
+                relation.appendToPath(stringBuilder);
+            }
+        }
+
+        @Override
+        public Type getChildType(FieldNode father) {
+            return relations[relations.length-1].getChildType(father);
+        }
+    }
+
 }

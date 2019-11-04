@@ -1,10 +1,7 @@
 package dev.fervento.assertbydebug.parser;
 
 import com.intellij.debugger.engine.evaluation.EvaluateException;
-import com.sun.jdi.ClassType;
-import com.sun.jdi.Method;
-import com.sun.jdi.ObjectReference;
-import com.sun.jdi.StringReference;
+import com.sun.jdi.*;
 import dev.fervento.assertbydebug.BeanParser;
 import dev.fervento.assertbydebug.TypeParser;
 import dev.fervento.assertbydebug.entity.FieldNode;
@@ -23,7 +20,7 @@ public class ToStringTypeParser implements TypeParser {
 
     @Override
     public void parse(FieldNode father,
-                      FieldNode.Relation relationWithChild, String fieldName, ObjectReference objRef) throws EvaluateException {
+                      FieldNode.Relation relationWithChild, String fieldName, ObjectReference objRef) throws EvaluateException, ClassNotLoadedException {
 
         ClassType objectsClass = (ClassType)beanParser.getDebugProcess().getVirtualMachineProxy().classesByName("java.util.Objects").get(0);
         Method toStringMethod = objectsClass.methodsByName("toString", "(Ljava/lang/Object;)Ljava/lang/String;").get(0);
@@ -33,7 +30,10 @@ public class ToStringTypeParser implements TypeParser {
         beanParser.disableCollection(stringReference);
 
         this.fieldNode = new StringTypeParser.StringFieldNode(father, fieldName, stringReference);
-        this.relationWithChild = relationWithChild;
+        this.relationWithChild = new FieldNode.CompoundRelation(
+                    relationWithChild,
+                    new FieldNode.RelationByMethodCall(toStringMethod)
+            );
     }
 
     @Override
