@@ -6,6 +6,7 @@
     <description><![CDATA[
     <p><b>Create assertions while debugging.</b></p>
     <p>A convenient context menu for your debugger to copy the state of your POJOs instances as JUnit Assertions, JSON or JSOG.</p>
+    <img src="https://raw.githubusercontent.com/fervento/intellij-plugin-assert-by-debug/master/doc/assert-by-debug_screenshot.png">
 
     <h3>Features</h3>
     <ul>
@@ -19,8 +20,10 @@
         <li>Java Collections (map/list/set)</li>
         <li>Any POJOs</li>
         <li>java.util.UUID</li>
+        <li>java.io.File, java.nio.file.Path</li>
+        <li>java.util.Date, java.time.temporal.Temporal</li>
     </ul>
-    <p>The list will be extended in future release.</p>
+    <p>The list will be extended in future releases.</p>
 
     <h3>Contribute</h3>
     <p>Please, contribute to the open source project or report any issues at the <a href="http://github.com/fervento/intellij-plugin-assert-by-debug">link</a>.</p>
@@ -30,6 +33,11 @@
     ]]></description>
 
     <change-notes><![CDATA[
+        Version 1.1
+        <ul>
+            <li>Release for IntelliJ 2019.2</li>
+            <li>Bug fixes</li>
+        </ul>
         Version 1.0
         <ul>
             <li>First release for IntelliJ 2019.1</li>
@@ -59,6 +67,9 @@
             <action id="AssertByDebugCopyAsJSON" class="CopyAsJSONAction" text="Copy selected objects as JSON" />
             <action id="AssertByDebugCopyAsJSOG" class="CopyAsJSOGAction" text="Copy selected objects as JSOG" />
         </group>
-
     </actions>
+
+    <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/build_number_ranges.html for description -->
+    <idea-version since-build="191.3" until-build="201.*"/> <!-- any build until 20.1, not inclusive!-->
+
 </idea-plugin>
