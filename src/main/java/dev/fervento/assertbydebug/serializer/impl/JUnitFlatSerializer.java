@@ -5,6 +5,8 @@ import dev.fervento.assertbydebug.serializer.JUnitSerializer;
 import dev.fervento.assertbydebug.entity.FieldNode;
 import dev.fervento.assertbydebug.serializer.CodeGenerationContext;
 
+import java.math.BigDecimal;
+
 public class JUnitFlatSerializer implements JUnitSerializer {
     
     private CodeGenerationContext codeGenerationContext = new CodeGenerationContext();
@@ -55,6 +57,12 @@ public class JUnitFlatSerializer implements JUnitSerializer {
     @Override
     public void assertEquals(String value, FieldNode fieldNode) {
         codeGenerationContext.getCurrentScope().writeLine(ParserUtils.format("assertEquals(%s, %s);", value, codeGenerationContext.getPath(fieldNode)));
+    }
+
+    @Override
+    public void assertBigDecimalEqual(BigDecimal value, FieldNode fieldNode) {
+        codeGenerationContext.getCurrentScope().writeLine(ParserUtils.format("assertEquals(0, new BigDecimal(\"%s\").compareTo(%s));", value,
+                codeGenerationContext.getPath(fieldNode)));
     }
 
     public String toCode() {

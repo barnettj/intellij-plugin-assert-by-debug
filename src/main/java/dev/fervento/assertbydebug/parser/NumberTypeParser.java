@@ -9,6 +9,7 @@ import dev.fervento.assertbydebug.entity.ReferencedNode;
 import dev.fervento.assertbydebug.serializer.JUnitSerializer;
 import dev.fervento.assertbydebug.serializer.JsonSerializer;
 
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -32,6 +33,10 @@ public class NumberTypeParser implements TypeParser {
             primitiveValue = toDouble(beanParser, objRef);
         } else if (isIntegerType(objRef)) {
             primitiveValue = toLong(beanParser, objRef);
+        } else if (isBigDecimalType(objRef)) {
+            this.fieldNode = new NumberFieldNode(father, fieldName, objRef, toBigDecimal(beanParser, objRef));
+            this.relation = relationWithChild;
+            return;
         } else {
             throw new RuntimeException("Not expected type: " + objRef.referenceType().name());
         }
@@ -56,6 +61,19 @@ public class NumberTypeParser implements TypeParser {
 
     private static boolean isIntegerType(ObjectReference value) {
         return integerTypeNames.contains(value.referenceType().name());
+    }
+
+    private static boolean isBigDecimalType(ObjectReference value) {
+        return java.math.BigDecimal.class.getCanonicalName().equals(value.referenceType().name());
+    }
+
+    private BigDecimal toBigDecimal(BeanParser beanParser, ObjectReference value) throws EvaluateException {
+        final Method toString = value.referenceType()
+                .methodsByName("toString", "()Ljava/lang/String;").get(0);
+        final StringReference stringRef = (StringReference) beanParser.getDebugProcess().invokeInstanceMethod(beanParser.getEvaluationContext(), value, toString,
+                Collections.EMPTY_LIST, 0);
+        final String val = stringRef.toString().replaceAll("\"", "");
+        return new BigDecimal(val);
     }
 
     private PrimitiveValue toLong(BeanParser beanParser, ObjectReference value) throws EvaluateException {
@@ -87,11 +105,18 @@ public class NumberTypeParser implements TypeParser {
     public static class NumberFieldNode extends FieldNode implements ReferencedNode {
         private ObjectReference value;
         private PrimitiveValue primitiveValue;
+        private BigDecimal bigDecimal;
 
         public NumberFieldNode(FieldNode father, String fieldName, ObjectReference value, PrimitiveValue primitiveValue) {
             super(father, fieldName);
             this.value = value;
             this.primitiveValue = primitiveValue;
+        }
+
+        public NumberFieldNode(FieldNode father, String fieldName, ObjectReference value, BigDecimal bigDecimal) {
+            super(father, fieldName);
+            this.value = value;
+            this.bigDecimal = bigDecimal;
         }
 
         @Override
@@ -100,6 +125,8 @@ public class NumberTypeParser implements TypeParser {
                 jUnitSerializer.assertEquals(primitiveValue.longValue(), this);
             } else if (isFloatType(value)) {
                 jUnitSerializer.assertEquals(primitiveValue.doubleValue(), this);
+            } else if (isBigDecimalType(value)) {
+                jUnitSerializer.assertBigDecimalEqual(bigDecimal, this);
             } else {
                 throw new RuntimeException("Not expected type: " + value.referenceType().name());
             }
